@@ -1,10 +1,15 @@
 import React from 'react';
-import model from './model';
 import Model from './model';
 
 const Waves = new Model(100, 100, 100);
 const waves = Waves.getState();
 
 export default function () {
-  return <svg>{waves.map((w: any) => w.map((c: any) => <circle cx={c} cy={c.y} r="40" />))}</svg>;
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  return (
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+      {waves.map((w: any) => w.map((c: any) => <circle key={c.id} cx={c.x} cy={c.y} r={c.r} fill={c.color} />))}
+    </svg>
+  );
 }
