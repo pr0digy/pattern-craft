@@ -1,14 +1,19 @@
 import React, { Fragment } from 'react';
-import { Normalize } from 'styled-normalize';
-import { useWindowSize } from 'react-use';
+import { create } from 'jss';
+import { StylesProvider, jssPreset } from '@material-ui/core/styles';
+
+// import { Normalize } from 'styled-normalize';
+const jss = create({
+	plugins: [...jssPreset().plugins],
+});
 
 import App from './App';
 
 export default function IndexPage() {
 	return (
-		<Fragment>
-			<Normalize />
+		<StylesProvider jss={jss}>
+			{/* <Normalize /> */}
 			<App />
-		</Fragment>
+		</StylesProvider>
 	);
 }
