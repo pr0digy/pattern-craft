@@ -10,6 +10,7 @@
   "main": "src/index.tsx",
   "dependencies": {
     "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
     "d3": "5.16.0",
     "nanoid": "^3.1.12",
     "normalize.css": "^8.0.1",
