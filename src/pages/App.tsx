@@ -2,6 +2,7 @@ import React from 'react';
 import Fab from '@material-ui/core/Fab';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import { makeStyles } from '@material-ui/core/styles';
+import Link from 'next/link';
 
 const useStyles = makeStyles({
 	root: {
@@ -15,7 +16,7 @@ export default function App() {
 	const styles = useStyles();
 	return (
 		<div className="App">
-			<div>Hi!</div>
+			<Link href="/circle-waves">Circle waves</Link>
 			<Fab color="primary" aria-label="add" className={styles.root}>
 				<KeyboardArrowUpIcon />
 			</Fab>
