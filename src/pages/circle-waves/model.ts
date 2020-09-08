@@ -34,8 +34,10 @@ export default function CircleWavesModel({
 }: CircleWavesInterface) {
 	let waves: Circle[][] = [];
 
-	const horizontalCount = Math.ceil((w / r) * 2);
-	const verticalCount = Math.ceil((h / r) * 2) + 2;
+	const horizontalCount = Math.ceil(w / r / 2);
+	const verticalCount = Math.ceil(h / r / 0.48);
+
+	console.log({ horizontalCount, verticalCount });
 
 	for (let i = 0; i < horizontalCount; i++) {
 		const index = i === 0 ? i : i % 2 ? i + 1 : i - 1;
