@@ -3,17 +3,33 @@ import { useWindowSize } from 'react-use';
 import dynamic from 'next/dynamic';
 import Drawer from '@material-ui/core/Drawer';
 import Slider from '@material-ui/core/Slider';
-import { makeStyles } from '@material-ui/core/styles';
-const useStyles = makeStyles({
-	root: {
-		width: 200,
-		padding: 20,
-	},
-});
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme: Theme) =>
+	createStyles({
+		root: {
+			width: 200,
+			padding: 20,
+		},
+		formControl: {
+			margin: theme.spacing(1),
+			minWidth: 120,
+		},
+		selectEmpty: {
+			marginTop: theme.spacing(2),
+		},
+	}),
+);
 
 import model from './model';
 
 const Svg = dynamic(() => import('./svg'), { ssr: false });
+
+export const ModelContext = React.createContext(null);
 
 export default function CircleWaves() {
 	const classes = useStyles();
@@ -23,17 +39,34 @@ export default function CircleWaves() {
 
 	const [zoom, setZoom] = React.useState(2);
 
-	const handleChange = (event, zoom) => {
+	const handleZoomChange = (event, zoom) => {
 		console.log(zoom);
 		setZoom(zoom);
 	};
 
-	const waves = useMemo(() => model({ w: width * 2, h: height * 2, r: 30 }), [width, height]);
+	const [interpolation, setInterpolation] = React.useState('interpolateTurbo');
+
+	const handleColorChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+		setInterpolation(event.target.value as string);
+	};
+
+	const waves = useMemo(() => model({ w: width * 2, h: height * 2, r: 75 }), [width, height]);
+	const circles = useMemo(() => waves.reduce((acc, wave) => acc.concat(wave), []), [waves]);
+	console.log('circles count: ', circles.length);
 	const toggleDrawer = (anchor, state) => console.log(anchor, state);
 
 	return (
-		<React.Profiler id="sw" onRender={console.log}>
-			<Drawer anchor="right" open={true} onClose={toggleDrawer('right', false)}>
+		<React.Profiler id="circle-waves" onRender={console.log}>
+			<Drawer
+				anchor="right"
+				open={true}
+				ModalProps={{
+					BackdropProps: {
+						invisible: false,
+					},
+				}}
+				onClose={() => toggleDrawer('right', false)}
+			>
 				<div className={classes.root}>
 					Zoom
 					<Slider
@@ -41,12 +74,27 @@ export default function CircleWaves() {
 						max={2}
 						step={0.1}
 						value={zoom}
-						onChange={handleChange}
+						onChange={handleZoomChange}
 						aria-labelledby="continuous-slider"
 					/>
+					<FormControl className={classes.formControl}>
+						<InputLabel id="demo-simple-select-label">Colors</InputLabel>
+						<Select
+							labelId="demo-simple-select-label"
+							id="demo-simple-select"
+							value={interpolation}
+							onChange={handleColorChange}
+						>
+							<MenuItem value="interpolateTurbo">interpolateTurbo</MenuItem>
+							<MenuItem value="interpolatePlasma">interpolatePlasma</MenuItem>
+							<MenuItem value="interpolateViridis">interpolateViridis</MenuItem>
+						</Select>
+					</FormControl>
 				</div>
 			</Drawer>
-			<Svg {...{ width, height, waves, zoom }} />
+			<ModelContext.Provider value={{ width, height, circles, zoom, interpolation }}>
+				<Svg />
+			</ModelContext.Provider>
 		</React.Profiler>
 	);
 }

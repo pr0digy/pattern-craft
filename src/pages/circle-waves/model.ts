@@ -46,11 +46,13 @@ export default function CircleWavesModel({
 
 		for (let j = 0; j < verticalCount; j++) {
 			const circle = {
-				id: nanoid(),
+				id: `${i}-${j}`,
+				// id: nanoid(),
 				x: r * 2 * (i + 1) - r,
 				y: (r / 2) * (j + 1) - r,
 				r: r + r * 0.03,
 				color: interpolate((j + 1) / verticalCount),
+				colorIndex: (j + 1) / verticalCount,
 			};
 
 			if (i % 2) waves[index].push(circle);
