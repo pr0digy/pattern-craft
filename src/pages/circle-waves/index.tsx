@@ -1,13 +1,22 @@
-import React, { useMemo } from 'react';
+import React, { ChangeEvent, useMemo } from 'react';
 import { useWindowSize } from 'react-use';
 import dynamic from 'next/dynamic';
 import Drawer from '@material-ui/core/Drawer';
 import Slider from '@material-ui/core/Slider';
-import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
+
+import { MenuList } from '@material-ui/core';
+import * as colors from 'd3-scale-chromatic';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
+
+import GradientMenuItem from 'components/GradientMenuItem';
+import model from '../../models/circle-waves';
+
+export const ModelContext = React.createContext(null);
+
+const gradients = Object.keys(colors).filter((v) => v.includes('interpolate'));
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -25,11 +34,7 @@ const useStyles = makeStyles((theme: Theme) =>
 	}),
 );
 
-import model from './model';
-
 const Svg = dynamic(() => import('./svg'), { ssr: false });
-
-export const ModelContext = React.createContext(null);
 
 export default function CircleWaves() {
 	const classes = useStyles();
@@ -38,37 +43,31 @@ export default function CircleWaves() {
 	if (!width || !height) return null;
 
 	const [zoom, setZoom] = React.useState(2);
+	const [interpolationName, setInterpolationName] = React.useState('interpolatePlasma');
 
-	const handleZoomChange = (event, zoom) => {
-		console.log(zoom);
-		setZoom(zoom);
+	const handleColorChange = (gradientName: string) => () => setInterpolationName(gradientName);
+	const handleZoomChange = (event: ChangeEvent<{}>, zoom: number | number[]) => {
+		setZoom(Number(zoom));
 	};
 
-	const [interpolation, setInterpolation] = React.useState('interpolateTurbo');
-
-	const handleColorChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-		setInterpolation(event.target.value as string);
-	};
-
-	const waves = useMemo(() => model({ w: width * 2, h: height * 2, r: 75 }), [width, height]);
+	const waves = useMemo(() => model({ w: width * 2, h: height * 2, r: 200 }), [width, height]);
 	const circles = useMemo(() => waves.reduce((acc, wave) => acc.concat(wave), []), [waves]);
-	console.log('circles count: ', circles.length);
-	const toggleDrawer = (anchor, state) => console.log(anchor, state);
+	const toggleDrawer = (anchor: string, state: boolean) => console.log(anchor, state);
 
 	return (
-		<React.Profiler id="circle-waves" onRender={console.log}>
+		<>
 			<Drawer
 				anchor="right"
 				open={true}
 				ModalProps={{
 					BackdropProps: {
-						invisible: false,
+						invisible: true,
 					},
 				}}
 				onClose={() => toggleDrawer('right', false)}
 			>
 				<div className={classes.root}>
-					Zoom
+					<Typography id="continuous-slider">Zoom</Typography>
 					<Slider
 						min={0.1}
 						max={2}
@@ -77,24 +76,24 @@ export default function CircleWaves() {
 						onChange={handleZoomChange}
 						aria-labelledby="continuous-slider"
 					/>
-					<FormControl className={classes.formControl}>
-						<InputLabel id="demo-simple-select-label">Colors</InputLabel>
-						<Select
-							labelId="demo-simple-select-label"
-							id="demo-simple-select"
-							value={interpolation}
-							onChange={handleColorChange}
-						>
-							<MenuItem value="interpolateTurbo">interpolateTurbo</MenuItem>
-							<MenuItem value="interpolatePlasma">interpolatePlasma</MenuItem>
-							<MenuItem value="interpolateViridis">interpolateViridis</MenuItem>
-						</Select>
-					</FormControl>
+
+					<MenuList>
+						{gradients.map((gradientName) => (
+							<GradientMenuItem
+								key={gradientName}
+								{...{
+									interpolationName: colors[gradientName],
+									selected: gradientName === interpolationName,
+									onClick: handleColorChange(gradientName),
+								}}
+							/>
+						))}
+					</MenuList>
 				</div>
 			</Drawer>
-			<ModelContext.Provider value={{ width, height, circles, zoom, interpolation }}>
+			<ModelContext.Provider value={{ width, height, circles, zoom, interpolationName }}>
 				<Svg />
 			</ModelContext.Provider>
-		</React.Profiler>
+		</>
 	);
 }

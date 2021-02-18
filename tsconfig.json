@@ -1,6 +1,13 @@
 {
-  "include": ["./src/*", "src/pages/App.tsx"],
+  "include": ["./src/*"],
+  
   "compilerOptions": {
+    "paths": {
+      "@components/*": [
+        "components/*"
+      ],
+      
+    },
     "strict": true,
     "esModuleInterop": true,
     "lib": ["dom", "es2015"],
