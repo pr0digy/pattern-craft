@@ -4,7 +4,7 @@ import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import MenuItem from '@material-ui/core/MenuItem';
 
 const useStyles = makeStyles({
-	gradient: ({ colors }) => {
+	gradient: ({ colors }: { colors: string[] }) => {
 		const step = Math.ceil(100 / (colors.length - 1));
 		const lastColor = `${colors.pop()} ${100}%`;
 
@@ -27,13 +27,13 @@ const useStyles = makeStyles({
 	},
 });
 
-export default function GradientButton({ interpolationName, resolution = 10, ...rest }) {
+export default function GradientMenuItem({ interpolate, resolution = 10, ...rest }) {
 	const colors = [];
 	const step = 1 / resolution;
 
 	let index = 0;
 	for (let i = 0; i <= resolution; i++) {
-		colors.push(interpolationName(index));
+		colors.push(interpolate(index));
 		index += step;
 	}
 

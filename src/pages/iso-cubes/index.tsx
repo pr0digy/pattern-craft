@@ -10,11 +10,12 @@ import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 
 import GradientMenuItem from 'components/GradientMenuItem';
-import model from '../../models/circle-waves';
+// import model from '../../models/circle-waves';
 
 export const ModelContext = React.createContext(null);
 
 const gradients = Object.keys(colors).filter((v) => v.includes('interpolate'));
+console.log(gradients);
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -48,9 +49,15 @@ export default function CircleWaves() {
 		setZoom(Number(zoom));
 	};
 
-	const waves = useMemo(() => model({ w: width * 2, h: height * 2, r: 150 }), [width, height]);
-	const circles = useMemo(() => waves.reduce((acc, wave) => acc.concat(wave), []), [waves]);
-	const toggleDrawer = (anchor: string, state: boolean) => console.log(anchor, state);
+	// const waves = useMemo(() => model({ w: width * 2, h: height * 2, r: 200 }), [width, height]);
+	// const circles = useMemo(() => waves.reduce((acc, wave) => acc.concat(wave), []), [waves]);
+	// const toggleDrawer = (anchor: string, state: boolean) => console.log(anchor, state);
+
+	return (
+		<ModelContext.Provider value={{ width, height, zoom, interpolationName }}>
+			<Svg />
+		</ModelContext.Provider>
+	);
 
 	return (
 		<>
@@ -62,7 +69,7 @@ export default function CircleWaves() {
 						invisible: true,
 					},
 				}}
-				onClose={() => toggleDrawer('right', false)}
+				// onClose={() => toggleDrawer('right', false)}
 			>
 				<div className={classes.root}>
 					<Typography id="continuous-slider">Zoom</Typography>
@@ -89,7 +96,7 @@ export default function CircleWaves() {
 					</MenuList>
 				</div>
 			</Drawer>
-			<ModelContext.Provider value={{ width, height, circles, zoom, interpolationName }}>
+			<ModelContext.Provider value={{ width, height, zoom, interpolationName }}>
 				<Svg />
 			</ModelContext.Provider>
 		</>

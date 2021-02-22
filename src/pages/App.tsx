@@ -16,7 +16,14 @@ export default function App() {
 	const styles = useStyles();
 	return (
 		<div className="App">
-			<Link href="/circle-waves">Circle waves</Link>
+			<ul>
+				<li>
+					<Link href="/circle-waves">Circle waves</Link>
+				</li>
+				<li>
+					<Link href="/iso-cubes">Isometric cubes</Link>
+				</li>
+			</ul>
 			<Fab color="primary" aria-label="add" className={styles.root}>
 				<KeyboardArrowUpIcon />
 			</Fab>
