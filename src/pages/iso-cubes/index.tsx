@@ -41,7 +41,7 @@ export default function CircleWaves() {
 
 	if (!width || !height) return null;
 
-	const [zoom, setZoom] = React.useState(2);
+	const [zoom, setZoom] = React.useState(1);
 	const [interpolationName, setInterpolationName] = React.useState('interpolatePlasma');
 
 	const handleColorChange = (gradientName: string) => () => setInterpolationName(gradientName);
