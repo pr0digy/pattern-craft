@@ -41,6 +41,7 @@ export default function CircleWaves() {
 
 	if (!width || !height) return null;
 
+	const [zoomMin, zoomMax, zoomStep] = [0.1, 1, 0.1];
 	const [zoom, setZoom] = React.useState(1);
 	const [interpolationName, setInterpolationName] = React.useState('interpolatePlasma');
 
@@ -74,9 +75,9 @@ export default function CircleWaves() {
 				<div className={classes.root}>
 					<Typography id="continuous-slider">Zoom</Typography>
 					<Slider
-						min={0.1}
-						max={2}
-						step={0.1}
+						min={zoomMin}
+						max={zoomMax}
+						step={zoomStep}
 						value={zoom}
 						onChange={handleZoomChange}
 						aria-labelledby="continuous-slider"

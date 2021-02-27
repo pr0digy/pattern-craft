@@ -1,35 +1,23 @@
 import React, { memo, useContext } from 'react';
 import { motion } from 'framer-motion';
-import * as colors from 'd3-scale-chromatic';
+import * as colorScales from 'd3-scale-chromatic';
+import * as color from 'd3-color';
 import { ModelContext } from '.';
 
 export default memo(function IsoCubes() {
 	const { width, height, interpolationName, zoom } = useContext(ModelContext);
 
-	const maxWidth = width * 2;
-	const maxHeight = height * 2;
-
-	const zm = 0.5;
+	const zm = 1;
 	const currentWidth = width * zm;
 	const currentHeight = height * zm;
-	const cx = maxWidth / 2 - currentWidth / 2;
-	const cy = maxHeight / 2 - currentHeight / 2;
 
-	// console.log({ height, maxHeight, width, maxWidth, zoom, cx, cy });
-
-	const gridSize = 10;
-	const tileWidth = 50;
+	const tileWidth = 150;
 	const tileHeight = tileWidth / 2;
-	const gw = tileWidth * gridSize;
-	const gh = gw / 2;
+	const gridSize = [Math.ceil((width + tileWidth) / tileWidth), Math.ceil((height + tileHeight) / tileHeight)];
 
 	return (
-		// <svg width={width} height={height} viewBox={`${-gh} ${-tileWidth / 2} ${gw} ${gh}`}>
-		<svg width={width} height={height} viewBox={`${0} ${0} ${gw} ${gh + gh / 2}`}>
-			<g>
-				{/* <g transform={`translate(${cx + (tileWidth * gridSize) / 2}, ${cy + (tileWidth / 4) * gridSize})`}> */}
-				{drawBlocks({ tileWidth, gridSize })}
-			</g>
+		<svg width={width} height={height} viewBox={`${0} ${0} ${currentWidth} ${currentHeight}`}>
+			<g>{drawBlocks({ tileWidth, gridSize })}</g>
 		</svg>
 	);
 });
@@ -72,11 +60,14 @@ function Tile({ points, fill = randomColor(), tx, ty }) {
 	return <polygon points={points} fill={fill} transform={`translate(${tx}, ${ty})`} />;
 }
 
-function drawBlocks({ tileWidth = 100, gridSize = 20 }) {
+console.log(colorScales);
+function drawBlocks({ tileWidth = 100, gridSize = [10, 10] }) {
 	const res = [];
+	const [horizontalCount, verticalCount] = gridSize;
+	const totalCount = horizontalCount * verticalCount;
 	let key = 1;
-	for (let x = 0; x < gridSize; x++) {
-		for (let y = 0; y < gridSize; y++) {
+	for (let x = 0; x < horizontalCount; x++) {
+		for (let y = 0; y < verticalCount; y++) {
 			// const dx = 15 - x,
 			// 	dy = 15 - y,
 			// 	dist = Math.sqrt(dx * dx + dy * dy),
@@ -84,7 +75,7 @@ function drawBlocks({ tileWidth = 100, gridSize = 20 }) {
 			// const z = Math.floor(Math.random() * 1);
 			// const z = (gridSize - 1) * 2 - (x + y);
 			const z = 1;
-			res.push(<Block {...{ x, y, z, tileWidth, key }} />);
+			res.push(<Block {...{ x, y, z, tileWidth, key, colorIndex: key / totalCount }} />);
 			key++;
 		}
 	}
@@ -92,10 +83,11 @@ function drawBlocks({ tileWidth = 100, gridSize = 20 }) {
 	return res;
 }
 
-function Block({ x, y, z, tileWidth }) {
-	const top = '#eee';
-	const right = '#ccc';
-	const left = '#999';
+function Block({ x, y, z, tileWidth, colorIndex }) {
+	const top = colorScales.interpolateTurbo(colorIndex);
+	// console.log(color.rgb(top));
+	const right = color.rgb(top).brighter();
+	const left = color.rgb(top).darker();
 
 	// const tileWidth = 100;
 	const tileHeight = tileWidth / 2;
@@ -127,19 +119,16 @@ function Block({ x, y, z, tileWidth }) {
 
 	const rightPoints = rightCoords.map((c) => c.join(',')).join(' ');
 
-	// const tx = ((x - y) * tileWidth) / 2;
-	// const ty = ((y + x) * tileWidth) / 1.33;
-
 	const even = !(y % 2);
 	const tx = even ? x * tileWidth : x * tileWidth + tileWidth / 2;
-	const ty = (y * tileWidth) / 1.33;
+	const ty = (y * tileWidth) / 1.333;
 
 	return (
 		<g id={`${x}-${y}`} transform={`translate(${tx}, ${ty})`}>
 			<polygon points={topPoints} fill={top} />
 			<polygon points={leftPoints} fill={left} />
 			<polygon points={rightPoints} fill={right} />
-			<text transform={`translate(${-tileHeight / 4}, ${-tileHeight / 2})`} fontSize="10">{`${x}-${y}`}</text>
+			{/* <text transform={`translate(${-tileHeight / 4}, ${-tileHeight / 2})`} fontSize="10">{`${x}-${y}`}</text> */}
 		</g>
 	);
 }
